@@ -14,6 +14,4 @@ while True:
   ledR.off()
  sleep(0.05)
 
-#hahaha
-#hihihi
-#huhuhu
+#mm
