@@ -1,24 +1,18 @@
-import speech_recognition as sr
+from openai import OpenAI
+client = OpenAI()  # Initialize OpenAI client (reads API key from environment)
 
-# Khởi tạo bộ nhận dạng
-recognizer = sr.Recognizer()
+def audio_to_text(filename: str = "input.wav") -> str:
+    with open(filename, "rb") as audio_file:  # Open the WAV file in binary read mode
+        # Send the audio to the transcription (STT) model
+        result = client.audio.transcriptions.create(
+            model="gpt-4o-transcribe",      # STT model name
+            file=audio_file,                # audio file object
+            response_format="text",         # ask for plain text output
+            prompt="The user will speak English commands such as 'turn on', 'turn off', or 'blink'"
+        )
 
-# Sử dụng microphone làm nguồn âm thanh
-with sr.Microphone() as source:
-    print("Hãy nói gì đó...")
-    audio_data = recognizer.listen(source)
-    print("Đang xử lý...")
+    return result.strip()  # Remove space and return the text
 
-    try:
-        # Nhận dạng giọng nói bằng Google Speech Recognition
-        text = recognizer.recognize_google(audio_data, language="vi-VN")
-        print("Bạn vừa nói:", text)
-
-        # Ghi kết quả vào file log.txt
-        with open("speech_log.txt", "a") as f:
-            f.write(text + "\n")
-
-    except sr.UnknownValueError:
-        print("Không nhận dạng được âm thanh.")
-    except sr.RequestError:
-        print("Lỗi kết nối đến dịch vụ nhận dạng.")
+if __name__ == "__main__":
+    text = audio_to_text("input.wav")
+    print("Recognized text:", text)
